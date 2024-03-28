@@ -5,8 +5,20 @@ import React from "react";
 
 function App() {
   const baseURL = "http://localhost:3000/reviews/index/";
+  const refreshReviews = "http://localhost:3000/reviews/index/";
+
 
   const [reviews, setReviews] = useState([]);
+
+  const updateReviews = () => {
+    axios.get(refreshReviews)
+      .then(response => {
+        setReviews(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching reviews:', error);
+      });
+  };
 
   useEffect(() => {
     axios.get(baseURL)
@@ -18,24 +30,31 @@ function App() {
       });
   }, []);
 
+  const formatDateTime = (dateTimeString) => {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateTimeString).toLocaleString(undefined, options);
+  };
+
   return (
     <div className="App">
       <h1>Latest Reviews</h1>
-      <ul>
-        {reviews.map(review => (
-          <li key={review.id}>
-            <strong>{review.author}</strong> - {review.score}/5 - {review.submission_time}
-            <p>{review.content}</p>
-          </li>
+      <div className="button-container">
+      <button onClick={updateReviews}>Update Reviews List</button>
+      </div>
+      <div className="card-container">
+        {reviews.map((review, index) => (
+          <div className="card" key={index}>
+            <div className="card-header">
+              <h2>{review.author}</h2>
+              <p>Score: {review.score}/5</p>
+            </div>
+            <div className="card-body">
+              <p>{review.content}</p>
+              <p>{formatDateTime(review.submission_time)}</p>
+            </div>
+          </div>
         ))}
-      </ul>
-      {/* <ul>
-        reviews.map((review, index) => (
-          <li key ={index}>
-            <h2>{reviews.author</h2>
-          </li>
-        )) */}
-      {/* </ul> */}
+      </div>
     </div>
   );
 }
