@@ -45,7 +45,7 @@ function App() {
         {reviews.map((review, index) => (
           <div className="card" key={index}>
             <div className="card-header">
-              <h2>{review.author}</h2>
+              <p>Username: {review.author}</p>
               <p>Score: {review.score}/5</p>
             </div>
             <div className="card-body">
