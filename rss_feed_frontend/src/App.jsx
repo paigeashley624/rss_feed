@@ -1,37 +1,43 @@
-// import { useState } from 'react'
 import axios from "axios";
 import { useState, useEffect } from "react";
 import './App.css'
+import React from "react";
 
 function App() {
+  const baseURL = "http://localhost:3000/reviews/index/";
 
-
-  const baseURL = "https://localhost:3000/reviews/fetch/";
-
-  const [review, setReview] = useState(null);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    axios.get(baseURL).then((response) => {
-      setReview(response.data);
-    });
+    axios.get(baseURL)
+      .then(response => {
+        setReviews(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching reviews:', error);
+      });
   }, []);
 
-  if (!review) return null;
-
   return (
-    <>
-      {/* <div>
-
-      <h1>RSS Feed : *insert title of app here* </h1>
-      </div> */}
-
-      <div>
-      <h1>{review.title}</h1>
-      <p>{review.body}</p>
-      </div>
-
-    </>
-  )
+    <div className="App">
+      <h1>Latest Reviews</h1>
+      <ul>
+        {reviews.map(review => (
+          <li key={review.id}>
+            <strong>{review.author}</strong> - {review.score}/5 - {review.submission_time}
+            <p>{review.content}</p>
+          </li>
+        ))}
+      </ul>
+      {/* <ul>
+        reviews.map((review, index) => (
+          <li key ={index}>
+            <h2>{reviews.author</h2>
+          </li>
+        )) */}
+      {/* </ul> */}
+    </div>
+  );
 }
 
-export default App
+export default App;

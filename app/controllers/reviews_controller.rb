@@ -14,20 +14,39 @@ class ReviewsController < ApplicationController
 
       parsed_data = JSON.parse(rss_data)
 
-      @reviews = parsed_data['feed']['entry'].map do |entry|
-
+      parsed_data['feed']['entry'].each do |entry|
         date_and_time = entry['updated']['label']
-        formatted_date_and_time =  DateTime.parse(date_and_time).strftime('%m-%d-%Y %H:%M')
+        submitted_at = DateTime.parse(date_and_time)
 
-        {
+        hours_difference = ((DateTime.now - submitted_at) * 24).to_i
+
+        next if hours_difference > 48
+
+        review_attributes = {
+          entry_id: entry['id']['label'],
           author: entry['author']['name']['label'],
           score: entry['im:rating']['label'].to_i,
           content: entry['content']['label'],
-          submitted_at: formatted_date_and_time
+          submission_time: submitted_at
         }
+
+        Review.find_or_create_by(review_attributes)
       end
+
+      @reviews = Review.order(submission_time: :desc)
+      # .limit(10)
+
     else
       @error = "Failed to fetch data"
+      render json: { error: @error }, status: :unprocessable_entity
     end
   end
+
+
+  def index
+    fetch()
+    @reviews = Review.all
+    render  json: @reviews
+  end
+
 end
