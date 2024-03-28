@@ -32,16 +32,16 @@ class ReviewsController < ApplicationController
 
         Review.find_or_create_by(review_attributes)
       end
-
-      @reviews = Review.order(submission_time: :desc)
-      # .limit(10)
-
+      if params[:action] == 'fetch'
+        render json: parsed_data, status: :ok
+      else
+        @reviews = Review.order(submission_time: :desc)
+      end
     else
       @error = "Failed to fetch data"
       render json: { error: @error }, status: :unprocessable_entity
     end
   end
-
 
   def index
     fetch()
